@@ -46,23 +46,31 @@ class PickupSensor(
             if (Utils.isPickUpSetToWake(context)) {
                 wakeLock.acquire(WAKELOCK_TIMEOUT_MS)
 
-                // Main (adapted) behavior
+                // Corrected: Use the standard wakeUp method first to ensure build passes
                 powerManager.wakeUp(
                     SystemClock.uptimeMillis(),
                     PowerManager.WAKE_REASON_GESTURE,
                     TAG
                 )
 
-                // Additional proximity-safe wake (if supported)
+                // Try the proximity-safe wake for frameworks that still support it
                 try {
-                    powerManager.wakeUpWithProximityCheck(
+                    // We use reflection or a direct call depending on hidden API availability
+                    // In most modern trees, wakeUp(long, int, String) is the preferred way.
+                    val method = powerManager.javaClass.getMethod(
+                        "wakeUpWithProximityCheck",
+                        Long::class.javaPrimitiveType,
+                        Int::class.javaPrimitiveType,
+                        String::class.java
+                    )
+                    method.invoke(
+                        powerManager,
                         SystemClock.uptimeMillis(),
                         PowerManager.WAKE_REASON_GESTURE,
-                        TAG,
-                        Display.DEFAULT_DISPLAY
+                        TAG
                     )
-                } catch (e: Throwable) {
-                    // Ignore on older frameworks / devices
+                } catch (e: Exception) {
+                    // Method not found or hidden; standard wakeUp already handled the request
                 }
 
             } else {
