@@ -4,6 +4,10 @@ app_domain(esim_switcher_app)
 hal_client_domain(esim_switcher_app, vendor_hal_oplus_esim)
 hal_client_domain(esim_switcher_app, vendor_hal_qspmhal)
 
+# Allow finding standard API services
 allow esim_switcher_app app_api_service:service_manager find;
+allow esim_switcher_app audioserver_service:service_manager find;
+allow esim_switcher_app radio_service:service_manager find;
 
+# This is correct:
 get_prop(esim_switcher_app, vendor_persist_nfc_prop)
