@@ -21,8 +21,12 @@ class PickupSensor(
     sensorType: String,
     private val sensorValue: Float,
 ) : SensorEventListener {
+
     private val powerManager = context.getSystemService(PowerManager::class.java)!!
-    private val wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG)
+    private val wakeLock = powerManager.newWakeLock(
+        PowerManager.PARTIAL_WAKE_LOCK,
+        TAG
+    )
 
     private val sensorManager = context.getSystemService(SensorManager::class.java)!!
     private val sensor = Utils.getSensor(sensorManager, sensorType)
@@ -32,34 +36,55 @@ class PickupSensor(
 
     override fun onSensorChanged(event: SensorEvent) {
         if (DEBUG) Log.d(TAG, "Got sensor event: ${event.values[0]}")
+
         val delta = SystemClock.elapsedRealtime() - entryTimestamp
-        if (delta < MIN_PULSE_INTERVAL_MS) {
-            return
-        }
+        if (delta < MIN_PULSE_INTERVAL_MS) return
+
         entryTimestamp = SystemClock.elapsedRealtime()
+
         if (event.values[0] == sensorValue) {
             if (Utils.isPickUpSetToWake(context)) {
                 wakeLock.acquire(WAKELOCK_TIMEOUT_MS)
-                powerManager.wakeUpWithProximityCheck(
+
+                // Main (adapted) behavior
+                powerManager.wakeUp(
                     SystemClock.uptimeMillis(),
                     PowerManager.WAKE_REASON_GESTURE,
-                    TAG,
-                    Display.DEFAULT_DISPLAY,
+                    TAG
                 )
+
+                // Additional proximity-safe wake (if supported)
+                try {
+                    powerManager.wakeUpWithProximityCheck(
+                        SystemClock.uptimeMillis(),
+                        PowerManager.WAKE_REASON_GESTURE,
+                        TAG,
+                        Display.DEFAULT_DISPLAY
+                    )
+                } catch (e: Throwable) {
+                    // Ignore on older frameworks / devices
+                }
+
             } else {
                 Utils.launchDozePulse(context)
             }
         }
     }
 
-    override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {}
+    override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {
+        // no-op
+    }
 
     fun enable() {
         if (sensor != null) {
             Log.d(TAG, "Enabling")
             executorService.submit {
                 entryTimestamp = SystemClock.elapsedRealtime()
-                sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL)
+                sensorManager.registerListener(
+                    this,
+                    sensor,
+                    SensorManager.SENSOR_DELAY_NORMAL
+                )
             }
         }
     }
@@ -67,7 +92,9 @@ class PickupSensor(
     fun disable() {
         if (sensor != null) {
             Log.d(TAG, "Disabling")
-            executorService.submit { sensorManager.unregisterListener(this, sensor) }
+            executorService.submit {
+                sensorManager.unregisterListener(this, sensor)
+            }
         }
     }
 
