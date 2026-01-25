@@ -64,9 +64,10 @@ cc_binary {
         "libbinder",
         "libutils",
         "vendor.lineage.livedisplay-V1-ndk",
-    ],
-    header_libs: [
+
+      header_libs: [
         "kernel_headers.oplus",
+        "vendor.lineage.livedisplay-sdm-headers",
         "vendor.lineage.livedisplay-oplus-headers",
     ],
     cflags: select(soong_config_variable("OPLUS_LINEAGE_LIVEDISPLAY_HAL", "ENABLE_AB"), {
