@@ -53,6 +53,10 @@ persist.sys.log.awb             u:object_r:exported_system_prop:s0
 # Modem
 persist.sys.enable_modem_dump    u:object_r:exported_system_prop:s0
 
+# NFC
+# Added to match NXP NFC relabeling
+persist.vendor.nfc.             u:object_r:vendor_persist_nfc_prop:s0
+
 # Performance
 sys.oplus.high.performance    u:object_r:exported_system_prop:s0
 
@@ -60,13 +64,9 @@ sys.oplus.high.performance    u:object_r:exported_system_prop:s0
 persist.radio.oplus.qcrild_start    u:object_r:exported_system_prop:s0
 ro.build.display.full_id            u:object_r:exported_system_prop:s0
 ro.build.oplus_nv_id                u:object_r:exported_system_prop:s0
-ro.oplus.dailyota                   u:object_r:exported_default_prop:s0
 ro.sys.reserve.integrate            u:object_r:exported_system_prop:s0
 sys.oplus_boot_mode                 u:object_r:exported_system_prop:s0
 sys.oplus.radio.                    u:object_r:system_oplus_radio_prop:s0
-
-# Secure Element
-ro.oplus.normal_boot_mode    u:object_r:exported_system_prop:s0
 
 # SVN
 ro.build.version.ota      u:object_r:exported_system_prop:s0
