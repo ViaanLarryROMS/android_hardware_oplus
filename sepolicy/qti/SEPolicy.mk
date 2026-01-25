@@ -6,14 +6,17 @@
 
 SEPOLICY_PLATFORM := $(subst device/qcom/sepolicy_vndr/,,$(SEPOLICY_PATH))
 
+# Vendor sepolicy directories
 BOARD_VENDOR_SEPOLICY_DIRS += \
     hardware/oplus/sepolicy/qti/vendor \
     hardware/oplus/sepolicy/qti/vendor/$(SEPOLICY_PLATFORM)
 
+# System_ext private sepolicy directories
 SYSTEM_EXT_PRIVATE_SEPOLICY_DIRS += \
     hardware/oplus/sepolicy/qti/private \
     hardware/oplus/sepolicy/qti/private/$(SEPOLICY_PLATFORM)
 
+# System_ext public sepolicy directories
 SYSTEM_EXT_PUBLIC_SEPOLICY_DIRS += \
     hardware/oplus/sepolicy/qti/public \
     hardware/oplus/sepolicy/qti/public/$(SEPOLICY_PLATFORM)
@@ -29,4 +32,5 @@ SYSTEM_EXT_PUBLIC_SEPOLICY_DIRS += \
     hardware/oplus/sepolicy/qti/public/common-um
 endif
 
-include device/lineage/sepolicy/libperfmgr/sepolicy.mk
+# Fix: Point to clover sepolicy path for Power HAL/libperfmgr
+include device/clover/sepolicy/libperfmgr/sepolicy.mk
